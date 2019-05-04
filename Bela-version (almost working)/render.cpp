@@ -538,11 +538,7 @@ bool setup(BelaContext *context, void *userData)
      */
     //    libpd_bind("tremoloRate");
     
-    
-    // if length of phase > 3333 -> phase(end) = phase(0)
-    
-    //    if (E.size()==0){
-    //    local intialisation
+    // can be uncommented, needs to be implemented in the render function itslelf in order to work
     double omega_ext = temp[1];
     //        int f = 0;
     std::vector<double> omegas;
