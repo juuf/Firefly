@@ -1,5 +1,5 @@
 - Call of function needs to properly implemented, and decided which value to send to PD in order to elicit a tone. 
 - Besides that, also the audio input from the microphone needs to be implemented.
-- For now, an interal firefly/signal "phi" synchronises to an external signal "phi_ext" which cannot adapt, <br />
-such that the internal signal adpats its frequency to the external fixed frequency. Therefore, as a first step <br />
+- For now, an interal firefly/signal "phi" synchronises to an external signal "phi_ext" which cannot adapt,
+such that the internal signal adpats its frequency to the external fixed frequency. Therefore, as a first step 
 this setup can be used without the need of an external audio input from the microphone.
