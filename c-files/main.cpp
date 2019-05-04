@@ -5,7 +5,7 @@
 //  Created by Julian on 26/04/2019.
 //  Copyright © 2019 Julian. All rights reserved.
 //
-// Memory of variables needs top be cleared after a while
+// Memory of variables needs top be cleared after a while when transfered to bela
 
 #include <iostream>
 #include <vector>
