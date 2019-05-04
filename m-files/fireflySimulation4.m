@@ -59,8 +59,7 @@ f = p.f;
 %set random seed
 % rng(1234)
 
-% for i = 2:SimulationLength
-    i = 2;
+        i = 2;
         j=1;
         if pas_.phi < 1
             phi = pas_.phi+pas_.omega(j)/sr; % tooth saw -> increase (phase=amplitude)
@@ -79,25 +78,18 @@ f = p.f;
 
     phiref = tref*pas_.omega*5e-4;
     
-    if pas_.ii==12635
-        
-    end
-
-%     for j=randperm(n) % go through all oscillators in random order.
-%        fprintf('time %d - pas_.phi(%d,:)=[%f %f], node %d\n',i,i, pas_.phi(i,:),j) % (for n=2 only)
          if pas_.phi_ext >= 1        % if external node is at maximum
-           % fprintf('pas_.phis %d %d %d \n',i,j,f(j))
            % f(j)=1;             % fire on every peak
             if f(j) == 0
                 pas_.in=pas_.in+1;
                 pas_.interactions(pas_.in,1:11) = [-1 i j 0 0 0 0 0 0 0 0];
             end
-            if f(j) == 1 && pas_.fire == 1      % if node j pas_.fires and firing has already occured at this time.
+            if f(j) == 1 && pas_.fire == 1      
                 pas_.in=pas_.in+1;
                 pas_.interactions(pas_.in,1:3) = [0 i j];
             end
 
-            if f(j) == 1 && pas_.fire == 0       % if node j pas_.fires and firing has not already occured at this time.
+            if f(j) == 1 && pas_.fire == 0      
 %                 pas_.fire = 1; % set flag for pas_.fire event at time i
 %                 phi = 1;   % j restrict self to max 1
                 pas_.phi_ext = 1;
@@ -192,20 +184,9 @@ f = p.f;
 %             end
         end
 
-%     end
-for ii=1:size(pas_.interactions,1)
-    if pas_.interactions(ii,10)==-Inf
-    %    t =1; 
-%     return
-    end
-end
-%     for j=1:n
         if phi >= 1
             phi = 1;
         end
-%             pas_.omegas(i,j) = pas_.omega(j);
-%     end
-% end
 
 pas_.phi = phi;
 
