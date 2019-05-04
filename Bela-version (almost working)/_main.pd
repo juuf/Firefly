@@ -1,0 +1,13 @@
+#N canvas 604 195 692 722 10;
+#X obj 149 209 r firefly;
+#X obj 393 164 loadbang;
+#X obj 390 237 print hallo;
+#X obj 324 347 r foo;
+#X obj 158 260 print;
+#X obj 456 342 r test;
+#X obj 325 379 print~;
+#X obj 456 397 print;
+#X connect 0 0 4 0;
+#X connect 1 0 2 0;
+#X connect 3 0 6 0;
+#X connect 5 0 7 0;
