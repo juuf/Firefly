@@ -1,3 +1,3 @@
 - Call of function needs to properly implemented, and decided which value to send to PD in order to elicit a tone. 
 - Besides that, also the audio input from the microphone needs to be implemented.
-- For now, an interal firefly/signal "phi" synchornises to an external signal "phi_ext" which cannot adapt.
+- For now, an interal firefly/signal "phi" synchronises to an external signal "phi_ext" which cannot adapt.
