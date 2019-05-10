@@ -41,7 +41,7 @@ vector<double> temp={1.834587198568937,2.970523429156172};
 double omega = temp[0];
 //omega_ext= temp[1];
 //int f = 0;
-vector<int> inter;
+//vector<int> inter;
 int delta_fire=1;
 vector<int> df;
 int ii;
@@ -123,7 +123,7 @@ double fireflySimulation(int f, double sr) {
     }
     else{
         if (fire==1){
-            inter.push_back(ii);
+//            inter.push_back(ii);
             df.push_back(delta_fire);
             delta_fire = 0;
         }
@@ -203,7 +203,7 @@ double fireflySimulation(int f, double sr) {
             }
             allzeros = std::accumulate(EE.begin(), EE.end(), 0.0);
         }
-        if (allzeros == 0 && (inter.size() > 8)){
+        if (allzeros == 0 && (df.size() > 8)){
 //            std::sort(inter.begin(), inter.end());
 //            std::reverse(inter.begin(), inter.end());
 //            vector<int> res_(inter.size());
