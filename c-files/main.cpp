@@ -5,7 +5,6 @@
 //  Created by Julian on 26/04/2019.
 //  Copyright © 2019 Julian. All rights reserved.
 //
-// Memory of variables needs top be cleared after a while when transfered to bela
 
 #include <iostream>
 #include <vector>
@@ -13,7 +12,8 @@
 #include <algorithm>
 #include <fstream>
 //#include <iterator>
-#include <ostream>
+//#include <ostream>
+#include<numeric>
 using namespace std;
 
 // function declaration
@@ -41,6 +41,7 @@ vector<double> temp={1.834587198568937,2.970523429156172};
 double omega = temp[0];
 //omega_ext= temp[1];
 //int f = 0;
+vector<int> inter;
 int ii;
 
 #define pi 3.14159265358979323846
@@ -80,16 +81,15 @@ int main() {
     
     
 //    Output to file
-//    std::ofstream ff1("phi_ext.txt"); // absolute path needed
-//    if(!ff1) { std::cerr << "Could not open file" << std::endl;};
-//    for(vector<double>::const_iterator i = phi_ext.begin(); i != phi_ext.end(); ++i) {
-//        ff1 << *i << '\n';}
-//    std::ofstream ff2("phi.txt"); // absolute path needed
-//    for(vector<double>::const_iterator i = phase.begin(); i != phase.end(); ++i) {
-//        ff2 << *i << '\n';}
-//    std::ofstream ff3("omegas.txt"); // absolute path needed
-//    for(vector<double>::const_iterator i = omegas.begin(); i != omegas.end(); ++i) {
-//        ff3 << *i << '\n';}
+    std::ofstream ff1("/Users/ju/Documents/Animation/firefly stuff/c-files/test/phi_ext.txt");
+    for(vector<double>::const_iterator i = phi_ext.begin(); i != phi_ext.end(); ++i) {
+        ff1 << *i << '\n';}
+    std::ofstream ff2("/Users/ju/Documents/Animation/firefly stuff/c-files/test/phi.txt");
+    for(vector<double>::const_iterator i = phase.begin(); i != phase.end(); ++i) {
+        ff2 << *i << '\n';}
+    std::ofstream ff3("/Users/ju/Documents/Animation/firefly stuff/c-files/test/omegas.txt");
+    for(vector<double>::const_iterator i = omegas.begin(); i != omegas.end(); ++i) {
+        ff3 << *i << '\n';}
 
 //    std::cout<<median({1,2,3,4});
     
@@ -109,13 +109,17 @@ double fireflySimulation(int f, double sr) {
     const int DoublingThreshold = 20;
     double phi;
     double phiref;
+    double allzeros;
     vector<double> CE;
+    vector<double> EE;
+//    vector<int> res_;
     
     if (pas_phi < 1){
         phi = pas_phi+omega/sr; //tooth saw -> increase (phase=amplitude)
         if (phi>=1) {phi=1;}
     }
     else{
+        if (fire==1){inter.push_back(ii);}
         fire = (fire+1)%2; //fire only on every other peak
         phi = 0;
     }
@@ -132,8 +136,10 @@ double fireflySimulation(int f, double sr) {
 //        pas_.interactions(pas_.in,1:3) = [0 i j];
         }
     
-        if (f == 1 && fire == 0){// if external node fires and internal firing has not already occured at this time.
-            if (phi > phiref){ // if the phase of internal node is above phiref
+        if (f == 1 && fire == 0){// if node j pas_.fires and firing has not already occured at this time.
+//            phi_ext[phi_ext.size()-1]  = 1;
+
+            if (phi > phiref){ // if the phase of node k is above phiref
                 
                 // PHASE COUPLING FUNCTION
                 phi = phi+Alpha*(-sin(phi*2*pi))*abs(sin(phi*2*pi));
@@ -148,8 +154,9 @@ double fireflySimulation(int f, double sr) {
                     E.push_back((1-cos(2*pi*phi))/2); //else, error is calculated like this
                 }
 
+    
                 if (E.size() < FilterLength){
-                C.push_back(median(E));
+                    C.push_back(median(E));
                 }
                 else{
                     for(int ii =0;ii<(FilterLength);ii++){
@@ -172,38 +179,37 @@ double fireflySimulation(int f, double sr) {
 //            pas_.in=pas_.in+1;
 //            pas_.interactions(pas_.in,1:6) = [1 i j k 0 pas_.C(end)]; %col 5 == 0 means pas_.fire within tref
             }
-    }
+        }
     
-    if (domega[1] > 0){ // if there has been freq adjustments
-        omega = domega[0];    // Reachback pas_.firefly algorithm
-        domega = {0,0};
-//                   if pas_.omega(j) == 0
-//                                 disp('a node has died... pas_.omega = zero')
-//                         end
-//        pas_.in=pas_.in+1;
-//        pas_.interactions(pas_.in,1:10) = [-2 i j j 1 pas_.C(end) -1 0 0 pas_.omega(j)];
-    }
+        if (domega[1] > 0){ // if there has been freq adjustments
+            omega = domega[0];    // Reachback pas_.firefly algorithm
+            domega = {0,0};
+    //                   if pas_.omega(j) == 0
+    //                                 disp('a node has died... pas_.omega = zero')
+    //                         end
+    //        pas_.in=pas_.in+1;
+    //        pas_.interactions(pas_.in,1:10) = [-2 i j j 1 pas_.C(end) -1 0 0 pas_.omega(j)];
+        }
 
     
-//        Further adaptation of the frequency. Can be commented in later on, however probably more effective by including it first in the Matlab-version.
-//    if (length(pas_.E{j}) < FilterLength
-//        allzeroes = sum(pas_.E{j}(1:length(pas_.E{j})));
-//    allzeroes = filterType(pas_.E{j}(1:length(pas_.E{j})));
-//    else{
-//        allzeroes = sum(pas_.E{j}(length(pas_.E{j})-FilterLength+1:length(pas_.E{j})));
-//    allzeroes = filterType(pas_.E{j}(length(pas_.E{j})-FilterLength+1:length(pas_.E{j})));
-//        }
-//                 if allzeroes == 0 && length(pas_.interactions(pas_.interactions(:,3)==j & pas_.interactions(:,11)==1,1)) > 8
-//                        % length(pas_.interactions(pas_.interactions(:,3)==j,1))
-//                        % disp('selfmean adjust')
-//                        sorted.Omegas = sort(pas_.interactions(pas_.interactions(:,3)==j & pas_.interactions(:,11)==1,2),'descend')';
-//
-//                        pas_.omega(j) = -2000/mean(diff(sorted.Omegas(1:FilterLength)));
-//                    pas_.in=pas_.in+1;
-//                    pas_.interactions(pas_.in,1:10) = [-3 i j j 1 pas_.C(end) -1 0 0 pas_.omega(j)];
-//                end
-//    end
-
+        if (E.size() < FilterLength){
+            allzeros = std::accumulate(E.begin(), E.end(), 0.0);
+        }
+        else{
+    //    allzeros = filterType(pas_.E{j}(length(pas_.E{j})-FilterLength+1:length(pas_.E{j})));
+            for(int ii =0;ii<(FilterLength);ii++){
+                EE.push_back(E[E.size()-FilterLength+ii]);
+            }
+            allzeros = std::accumulate(EE.begin(), EE.end(), 0.0);
+        }
+        if (allzeros == 0 && (inter.size() > 8)){
+            std::sort(inter.begin(), inter.end());
+            std::reverse(inter.begin(), inter.end());
+            vector<int> res_(inter.size());
+            std::adjacent_difference(inter.begin(), inter.end()-(inter.size()-FilterLength), res_.begin()); // difference of vector elements
+            double tt = std::accumulate(res_.begin()+1,res_.end(),0); // sum of difference to take the mean afterwards
+            omega = -2000*(FilterLength-1)/tt;
+        }
     }
     if (phi>1){phi=1;}
     
