@@ -81,15 +81,15 @@ int main() {
     
     
 //    Output to file
-    std::ofstream ff1("/Users/ju/Documents/Animation/firefly stuff/c-files/test/phi_ext.txt");
-    for(vector<double>::const_iterator i = phi_ext.begin(); i != phi_ext.end(); ++i) {
-        ff1 << *i << '\n';}
-    std::ofstream ff2("/Users/ju/Documents/Animation/firefly stuff/c-files/test/phi.txt");
-    for(vector<double>::const_iterator i = phase.begin(); i != phase.end(); ++i) {
-        ff2 << *i << '\n';}
-    std::ofstream ff3("/Users/ju/Documents/Animation/firefly stuff/c-files/test/omegas.txt");
-    for(vector<double>::const_iterator i = omegas.begin(); i != omegas.end(); ++i) {
-        ff3 << *i << '\n';}
+ //   std::ofstream ff1("abosulte path/phi_ext.txt");
+   //  for(vector<double>::const_iterator i = phi_ext.begin(); i != phi_ext.end(); ++i) {
+    //     ff1 << *i << '\n';}
+    // std::ofstream ff2("abosulte path//phi.txt");
+     //for(vector<double>::const_iterator i = phase.begin(); i != phase.end(); ++i) {
+        // ff2 << *i << '\n';}
+     //std::ofstream ff3("abosulte path/omegas.txt");
+     //for(vector<double>::const_iterator i = omegas.begin(); i != omegas.end(); ++i) {
+        // ff3 << *i << '\n';}
 
 //    std::cout<<median({1,2,3,4});
     
