@@ -42,6 +42,8 @@ double omega = temp[0];
 //omega_ext= temp[1];
 //int f = 0;
 vector<int> inter;
+int delta_fire=1;
+vector<int> df;
 int ii;
 
 #define pi 3.14159265358979323846
@@ -114,12 +116,17 @@ double fireflySimulation(int f, double sr) {
     vector<double> EE;
 //    vector<int> res_;
     
+    delta_fire++;
     if (pas_phi < 1){
         phi = pas_phi+omega/sr; //tooth saw -> increase (phase=amplitude)
         if (phi>=1) {phi=1;}
     }
     else{
-        if (fire==1){inter.push_back(ii);}
+        if (fire==1){
+            inter.push_back(ii);
+            df.push_back(delta_fire);
+            delta_fire = 0;
+        }
         fire = (fire+1)%2; //fire only on every other peak
         phi = 0;
     }
@@ -175,20 +182,15 @@ double fireflySimulation(int f, double sr) {
 //            pas_.in=pas_.in+1;
 //            pas_.interactions(pas_.in,1:9) = [1 i j k 1 pas_.C(end) phi-pas_.phi Beta*sin(2*pi*phi) pas_.domega(1,1)];
         }
-        else{
-//            pas_.in=pas_.in+1;
-//            pas_.interactions(pas_.in,1:6) = [1 i j k 0 pas_.C(end)]; %col 5 == 0 means pas_.fire within tref
-            }
+//        else{
+////            pas_.in=pas_.in+1;
+////            pas_.interactions(pas_.in,1:6) = [1 i j k 0 pas_.C(end)]; %col 5 == 0 means pas_.fire within tref
+//            }
         }
     
         if (domega[1] > 0){ // if there has been freq adjustments
             omega = domega[0];    // Reachback pas_.firefly algorithm
             domega = {0,0};
-    //                   if pas_.omega(j) == 0
-    //                                 disp('a node has died... pas_.omega = zero')
-    //                         end
-    //        pas_.in=pas_.in+1;
-    //        pas_.interactions(pas_.in,1:10) = [-2 i j j 1 pas_.C(end) -1 0 0 pas_.omega(j)];
         }
 
     
@@ -196,19 +198,25 @@ double fireflySimulation(int f, double sr) {
             allzeros = std::accumulate(E.begin(), E.end(), 0.0);
         }
         else{
-    //    allzeros = filterType(pas_.E{j}(length(pas_.E{j})-FilterLength+1:length(pas_.E{j})));
             for(int ii =0;ii<(FilterLength);ii++){
                 EE.push_back(E[E.size()-FilterLength+ii]);
             }
             allzeros = std::accumulate(EE.begin(), EE.end(), 0.0);
         }
         if (allzeros == 0 && (inter.size() > 8)){
-            std::sort(inter.begin(), inter.end());
-            std::reverse(inter.begin(), inter.end());
-            vector<int> res_(inter.size());
-            std::adjacent_difference(inter.begin(), inter.end()-(inter.size()-FilterLength), res_.begin()); // difference of vector elements
-            double tt = std::accumulate(res_.begin()+1,res_.end(),0); // sum of difference to take the mean afterwards
-            omega = -2000*(FilterLength-1)/tt;
+//            std::sort(inter.begin(), inter.end());
+//            std::reverse(inter.begin(), inter.end());
+//            vector<int> res_(inter.size());
+//            std::adjacent_difference(inter.begin(), inter.end()-(inter.size()-FilterLength), res_.begin()); // difference of vector elements
+//            double tt = std::accumulate(res_.begin()+1,res_.end(),0); // sum of difference to take the mean afterwards
+//            omega = -2000*(FilterLength-1)/tt;
+            // better implementation
+            vector<int> tmp_;
+            for(int ii=0;ii<(FilterLength-1);ii++){
+                tmp_.push_back(df[df.size()-FilterLength+1+ii]);
+            }
+            double ttt = std::accumulate(tmp_.begin(),tmp_.end(),0);
+            omega = 2000*(FilterLength-1)/ttt;
         }
     }
     if (phi>1){phi=1;}
