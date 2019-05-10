@@ -59,7 +59,11 @@ f = p.f;
 %set random seed
 % rng(1234)
 
-        i = 2;
+% pas_.delta_fire = pas_.delta_fire+1;
+
+pas_.delta_fire = pas_.delta_fire+1;
+% for i = 2:SimulationLength
+    i = 2;
         j=1;
         if pas_.phi < 1
             phi = pas_.phi+pas_.omega(j)/sr; % tooth saw -> increase (phase=amplitude)
@@ -70,6 +74,10 @@ f = p.f;
             % fprintf('%d %d %f %d \n',i,j,phi,f(j))
             pas_.in=pas_.in+1;
             pas_.interactions(pas_.in,[1:3,11]) = [2 i j pas_.fire];
+            if pas_.fire==1                  
+                pas_.df(end+1) = pas_.delta_fire; 
+                pas_.delta_fire = 0;
+            end
 %             f(j)=mod(f(j)+1,2); % pas_.fire only on every other peak
             pas_.fire = mod(pas_.fire+1,2);
             phi = 0;
@@ -78,18 +86,25 @@ f = p.f;
 
     phiref = tref*pas_.omega*5e-4;
     
+%     if pas_.ii==12635
+%         
+%     end
+
+%     for j=randperm(n) % go through all oscillators in random order.
+%        fprintf('time %d - pas_.phi(%d,:)=[%f %f], node %d\n',i,i, pas_.phi(i,:),j) % (for n=2 only)
          if pas_.phi_ext >= 1        % if external node is at maximum
+           % fprintf('pas_.phis %d %d %d \n',i,j,f(j))
            % f(j)=1;             % fire on every peak
             if f(j) == 0
                 pas_.in=pas_.in+1;
                 pas_.interactions(pas_.in,1:11) = [-1 i j 0 0 0 0 0 0 0 0];
             end
-            if f(j) == 1 && pas_.fire == 1      
+            if f(j) == 1 && pas_.fire == 1      % if node j pas_.fires and firing has already occured at this time.
                 pas_.in=pas_.in+1;
                 pas_.interactions(pas_.in,1:3) = [0 i j];
             end
 
-            if f(j) == 1 && pas_.fire == 0      
+            if f(j) == 1 && pas_.fire == 0       % if node j pas_.fires and firing has not already occured at this time.
 %                 pas_.fire = 1; % set flag for pas_.fire event at time i
 %                 phi = 1;   % j restrict self to max 1
                 pas_.phi_ext = 1;
@@ -172,23 +187,29 @@ f = p.f;
             end
 
                 %tmp(length(tmp)+1)=allzeroes;
-% 
-%             if allzeroes == 0 && length(pas_.interactions(pas_.interactions(:,3)==j & pas_.interactions(:,11)==1,1)) > 8
-%                 % length(pas_.interactions(pas_.interactions(:,3)==j,1))
-%                 % disp('selfmean adjust')
-%                 sorted.Omegas = sort(pas_.interactions(pas_.interactions(:,3)==j & pas_.interactions(:,11)==1,2),'descend')';
-%                 
-%                 pas_.omega(j) = -2000/mean(diff(sorted.Omegas(1:FilterLength)));
-%                 pas_.in=pas_.in+1;
-%                 pas_.interactions(pas_.in,1:10) = [-3 i j j 1 pas_.C(end) -1 0 0 pas_.omega(j)];
-%             end
+
+            if allzeroes == 0 && length(pas_.interactions(pas_.interactions(:,3)==j & pas_.interactions(:,11)==1,1)) > 8
+                pas_.omega(j) = 2000/mean(pas_.df(2+length(pas_.df)-FilterLength:end));
+            end
         end
 
+
+for ii=1:size(pas_.interactions,1)
+    if pas_.interactions(ii,10)==-Inf
+    %    t =1; 
+%     return
+    end
+end
+%     for j=1:n
         if phi >= 1
             phi = 1;
         end
+%             pas_.omegas(i,j) = pas_.omega(j);
+%     end
+% end
 
 pas_.phi = phi;
+
 
 if nargout > 0
     phaseOut = pas_.phi;
