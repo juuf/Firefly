@@ -11,9 +11,8 @@
 #include <math.h>
 #include <algorithm>
 #include <fstream>
-//#include <iterator>
-//#include <ostream>
 #include<numeric>
+#include <random>
 using namespace std;
 
 // function declaration
@@ -23,45 +22,74 @@ double median(vector<double> medi);
 // global intialisation
 //int in = 0;
 //double interactions [1][11]; //interactions[0] = {1,2,3,4,5,6,7,8,9,10,11};
-std::vector<double> E;
-std::vector<double> C;
+std::vector<double> E={1};
+std::vector<double> C={1};
 vector<double> domega(2,0);
 int fire = 0;
 
 int simlength = 8e4;
 int sr =1e3;
 
-// initial phase (temp2 = rand(2,1);)
-vector<double> temp2={0.191519450378892, 0.622108771039832};
-double pas_phi = temp2[0];
-vector<double> phi_ext;
+//srand(2345);
+// ((double) rand() / (RAND_MAX))
+
+
+//// initial phase
+//vector<double> temp2={0.191519450378892, 0.622108771039832};
+double pas_phi;// = temp2[0];
+vector<double> phi_ext; //= {temp2[1]};
 
 // initial frequency (temp = 2*2.^((rand(2,1)-0.5)*2);)
-vector<double> temp={1.834587198568937,2.970523429156172};
-double omega = temp[0];
-//omega_ext= temp[1];
-//int f = 0;
+//vector<double> temp={1.834587198568937,2.970523429156172};
+double omega;// = temp[0];
+double omega_ext;//= temp[1];
+int f = 0;
 //vector<int> inter;
 int delta_fire=1;
 vector<int> df;
 int ii;
+bool count_=true;
 
 #define pi 3.14159265358979323846
 
 
 int main() {
 //    local intialisation
-    double omega_ext = temp[1];
-    int f = 0;
+//    srand((unsigned) time(NULL));
+//    double omega_ext = temp[1];
+//    int f = 0;
     vector<double> omegas;
     vector<double> phase;
     
-    phi_ext.push_back(temp2[1]);
-    E.push_back(1);
-    C.push_back(1);
+//    std::vector<double> temp2;
+////    for (int k_=0; k_ <= 1; k_++){
+////        double b =((double) rand()/(RAND_MAX));
+////        temp2.push_back(b);
+////        //    cout << myVector[b] << endl;
+////    }
+//
+    if (count_==true){
+        // random phase and frequency intialisation
+        std::mt19937_64 rng;
+        // initialize the random number generator with time-dependent seed
+        uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+        std::seed_seq ss{uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed>>32)};
+        rng.seed(ss);
+        // initialise a uniform distribution between 0 and 1
+        std::uniform_real_distribution<double> unif(0, 1);
+        // phase intialisation
+        pas_phi = unif(rng);
+        phi_ext.push_back(unif(rng));
+        // frequency intialisation
+        std::uniform_real_distribution<double> unif_2(0,1);
+        omega = 2*pow(2,(unif_2(rng)-0.5)*2);
+        omega_ext= 2*pow(2,(unif_2(rng)-0.5)*2);
+        count_=false;  // only once
+    }
     
     phase.push_back(pas_phi);
     omegas.push_back(omega);
+    
     
     for (int i=2-1; i<simlength; i++) {
         ii=i;
@@ -134,20 +162,15 @@ double fireflySimulation(int f, double sr) {
     phiref = tref*omega*5e-4;
     
     if (phi_ext[phi_ext.size()-1] >= 1){    // if external node is at maximum
-        if (f == 0){
-//            pas_.in=pas_.in+1;
-//            pas_.interactions(pas_.in,1:11) = [-1 i j 0 0 0 0 0 0 0 0];
-        }
-        if (f == 1 && fire == 1){ // node j pas_.fires and firing has already occured at this time.
-//        pas_.in=pas_.in+1;
-//        pas_.interactions(pas_.in,1:3) = [0 i j];
-        }
+//        if (f == 0){
+//        }
+//        if (f == 1 && fire == 1){ // node j pas_.fires and firing has already occured at this time.
+//        }
     
-        if (f == 1 && fire == 0){// if node j pas_.fires and firing has not already occured at this time.
+        if (f == 1 && fire == 0){// if node external node fires and internal firing has not already occured at this time.
 //            phi_ext[phi_ext.size()-1]  = 1;
 
-            if (phi > phiref){ // if the phase of node k is above phiref
-                
+            if (phi > phiref){ // if internal phase is above phiref
                 // PHASE COUPLING FUNCTION
                 phi = phi+Alpha*(-sin(phi*2*pi))*abs(sin(phi*2*pi));
                 if (phi<0){phi=0;} // trim phase to [0 1] range
@@ -171,7 +194,6 @@ double fireflySimulation(int f, double sr) {
                     }
                     C.push_back(median(CE));
                 }
-
             // FREQUENCY COUPLING FUNCTION
             domega[0] = ((omega * pow(2,Beta*-sin(2*pi*phi)*C[C.size()-1]))+domega[0]*domega[1])/(domega[1]+1);
             domega[1] = domega[1]+1;
@@ -179,13 +201,7 @@ double fireflySimulation(int f, double sr) {
                 omega = 2*omega;
                 domega = {0,0};
             }
-//            pas_.in=pas_.in+1;
-//            pas_.interactions(pas_.in,1:9) = [1 i j k 1 pas_.C(end) phi-pas_.phi Beta*sin(2*pi*phi) pas_.domega(1,1)];
         }
-//        else{
-////            pas_.in=pas_.in+1;
-////            pas_.interactions(pas_.in,1:6) = [1 i j k 0 pas_.C(end)]; %col 5 == 0 means pas_.fire within tref
-//            }
         }
     
         if (domega[1] > 0){ // if there has been freq adjustments
